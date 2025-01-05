@@ -1,2 +1,5 @@
-# scratchmitedu
-Netlify Website for my scratch project.
+# hyprixdev.netlify.app
+Netlify Website for my projects!
+
+Current status/projects:
+none!
