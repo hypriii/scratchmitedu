@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch Username Check</title>
+    <style>
+        #error-message {
+            color: red;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Check Scratch Username</h2>
+    <label for="username">Enter Scratch Username:</label>
+    <input type="text" id="username" placeholder="Username">
+    
+    <div id="error-message"></div> <!-- Error message display area -->
+
+    <script>
+        document.getElementById("username").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                const username = document.getElementById("username").value;
+
+                // Validate input (optional, to ensure the input isn't empty)
+                if (!username.trim()) {
+                    showError("Username cannot be empty!");
+                    return;
+                }
+
+                // Clear previous error message
+                clearError();
+
+                const url = `https://api.scratch.mit.edu/accounts/checkusername/${username}`;
+                const corsProxy = 'https://cors-anywhere.heroku.app'
+
+                fetch(corsProxy + url)
+                    .then(response => {
+                        if (!response.ok) {
+                            // If the response is not OK (e.g., 404, 500), show an error
+                            throw new Error(`Failed to fetch data for username: ${username}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // If successful, trigger the download
+                        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = `${username}_check.json`;
+                        link.click();
+                    })
+                    .catch(error => {
+                        // Log the error and show an error message
+                        console.error("Error fetching the username data:", error);
+                        showError(`Error: ${error.message}`);
+                    });
+            }
+        });
+
+        // Function to display error messages
+        function showError(message) {
+            const errorDiv = document.getElementById("error-message");
+            errorDiv.textContent = message;
+        }
+
+        // Function to clear error messages
+        function clearError() {
+            const errorDiv = document.getElementById("error-message");
+            errorDiv.textContent = '';
+        }
+    </script>
+
+</body>
+</html>
